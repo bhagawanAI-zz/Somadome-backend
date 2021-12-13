@@ -2,7 +2,7 @@ Flask
 Flask-Restful
 Flask-JWT
 Flask-SQLAlchemy
-Flask-JWT-Extended
+Flask-JWT-Extended==3.7 
 Flask-Marshmallow
 marshmallow-sqlalchemy
 uwsgi
