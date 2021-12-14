@@ -63,7 +63,7 @@ class UserRegister(Resource):
 
 class User(Resource):
     @classmethod
-    # @jwt_required()
+    @jwt_required()
     def get(cls, user_name: str):
         user = UserModel.find_by_username(user_name)
         if not user:
@@ -72,6 +72,7 @@ class User(Resource):
         return user.json(), 200
 
     @classmethod
+    @jwt_required()
     def delete(cls, user_name: str):
         user = UserModel.find_by_username(user_name)
         if not user:
