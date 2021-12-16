@@ -1,8 +1,17 @@
 from datetime import datetime
+
+from flask import request
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt,
+    get_jwt_identity)
 from werkzeug.security import safe_str_cmp
 from marshmallow import ValidationError
+from werkzeug.utils import secure_filename
+
 from blacklist import BLACKLIST
 from models.user import UserModel
 
@@ -61,9 +70,12 @@ class UserRegister(Resource):
         return user.json_data(root_args['id']), 201
 
 
+
+
+
 class User(Resource):
     @classmethod
-    @jwt_required()
+    @jwt_required(fresh=True)
     def get(cls, user_name: str):
         user = UserModel.find_by_username(user_name)
         if not user:
@@ -72,7 +84,7 @@ class User(Resource):
         return user.json(), 200
 
     @classmethod
-    @jwt_required()
+    @jwt_required(fresh=True)
     def delete(cls, user_name: str):
         user = UserModel.find_by_username(user_name)
         if not user:
@@ -90,7 +102,7 @@ class UserLogin(Resource):
         root_args = root_parser.parse_args()
         nested_one_args = nested_one_parser.parse_args(req=root_args)
         # find user in database
-        user = UserModel.find_by_username(nested_one_args['username'])
+        user = UserModel.find_by_email(nested_one_args['email'])
         # check password
         if user:
             if safe_str_cmp(user.password, nested_one_args['password']):
@@ -102,7 +114,7 @@ class UserLogin(Resource):
                        }, 200
             else:
                 return {'message': 'Password does not match'}, 401
-        return {'message': 'No such user'}, 400
+        return {'message': 'No user with this mail id'}, 400
 
 
 class UserLogout(Resource):
@@ -111,6 +123,7 @@ class UserLogout(Resource):
         jti = get_jwt()["jti"]
         BLACKLIST.add(jti)
         return {'message': 'successfully logged out'}, 200
+
 
 #
 # class UserLogin(Resource):
@@ -142,10 +155,10 @@ class UserLogout(Resource):
 #        return {"message": USER_LOGGED_OUT.format(user_id)}, 200
 
 
-# class TokenRefresh(Resource):
-#    @classmethod
-#    @jwt_required(refresh=True)
-#    def post(cls):
-#        current_user = get_jwt_identity()
-#        new_token = create_access_token(identity=current_user, fresh=False)
-#        return {"access_token": new_token}, 200
+class TokenRefresh(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=False)
+        return {"access_token": new_token}, 200
+
