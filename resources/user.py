@@ -13,7 +13,8 @@ from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
 from blacklist import BLACKLIST
-from models.user import UserModel
+from db import db
+from models.user import UserModel, Img
 
 USER_ALREADY_EXISTS = "A user with that username already exists."
 USER_EMAIL_EXISTS = "A user with this email already exists."
@@ -23,37 +24,40 @@ USER_DELETED = "User deleted."
 INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={user_id}> successfully logged out."
 
-root_parser = reqparse.RequestParser()
+# root_parser = reqparse.RequestParser()
 nested_one_parser = reqparse.RequestParser()
-root_parser.add_argument('params', type=dict, required=True, help='this field cannot be blank')
-root_parser.add_argument('jsonrpc', type=str, required=True, help='this field cannot be blank')
-root_parser.add_argument('method', type=str, required=True, help='this field cannot be blank')
-root_parser.add_argument('id', type=int, required=True, help='this field cannot be blank')
-nested_one_parser.add_argument('username', type=str, location=('params',))
-nested_one_parser.add_argument('password', type=str, location=('params',))
-nested_one_parser.add_argument('email', type=str, location=('params',))
-nested_one_parser.add_argument('pwResetRequired', type=bool, location=('params',))
-nested_one_parser.add_argument('displayName', type=str, location=('params',))
-nested_one_parser.add_argument('headline', type=str, location=('params',))
-nested_one_parser.add_argument('firstName', type=str, location=('params',))
-nested_one_parser.add_argument('middleInitial', type=str, location=('params',))
-nested_one_parser.add_argument('lastName', type=str, location=('params',))
-nested_one_parser.add_argument('suffix', type=str, location=('params',))
-nested_one_parser.add_argument('phone', type=str, location=('params',))
-nested_one_parser.add_argument('address1', type=str, location=('params',))
-nested_one_parser.add_argument('address2', type=str, location=('params',))
-nested_one_parser.add_argument('city', type=str, location=('params',))
-nested_one_parser.add_argument('state', type=str, location=('params',))
-nested_one_parser.add_argument('zip', type=int, location=('params',))
-nested_one_parser.add_argument('birthDate', type=lambda x: datetime.strptime(x, '%B %d, %Y'), location=('params',))
+details_nested_one_parser = reqparse.RequestParser()
+# root_parser.add_argument('params', type=dict, required=True, help='this field cannot be blank')
+# root_parser.add_argument('jsonrpc', type=str, required=True, help='this field cannot be blank')
+# root_parser.add_argument('method', type=str, required=True, help='this field cannot be blank')
+# root_parser.add_argument('id', type=int, required=True, help='this field cannot be blank')
 
 
 class UserRegister(Resource):
+    nested_one_parser.add_argument('username', type=str)
+    nested_one_parser.add_argument('password', type=str, required=True,
+                                   help="This field cannot be blank.")
+    nested_one_parser.add_argument('email', type=str, required=True,
+                                   help="This field cannot be blank.")
+    nested_one_parser.add_argument('pwResetRequired', type=bool)
+    nested_one_parser.add_argument('displayName', type=str)
+    nested_one_parser.add_argument('headline', type=str)
+    nested_one_parser.add_argument('firstName', type=str)
+    nested_one_parser.add_argument('middleInitial', type=str)
+    nested_one_parser.add_argument('lastName', type=str)
+    nested_one_parser.add_argument('suffix', type=str)
+    nested_one_parser.add_argument('phone', type=str)
+    nested_one_parser.add_argument('address1', type=str)
+    nested_one_parser.add_argument('address2', type=str)
+    nested_one_parser.add_argument('city', type=str)
+    nested_one_parser.add_argument('state', type=str)
+    nested_one_parser.add_argument('zip', type=int)
+    nested_one_parser.add_argument('birthDate', type=lambda x: datetime.strptime(x, '%B %d, %Y'))
 
     def post(self):
         try:
-            root_args = root_parser.parse_args()
-            nested_one_args = nested_one_parser.parse_args(req=root_args)
+            # root_args = root_parser.parse_args()
+            nested_one_args = nested_one_parser.parse_args()
 
         except ValidationError as err:
             return err.messages, 400
@@ -67,17 +71,32 @@ class UserRegister(Resource):
         user = UserModel(**nested_one_args)
         user.save_to_db()
 
-        return user.json_data(root_args['id']), 201
+        return user.json_data(), 201
 
 
+class UploadImage(Resource):
+    def Post(self):
+        pic = request.files['pic']
+        if not pic:
+            return {"message": "No pic uploaded"}, 400
 
+        filename = secure_filename(pic.filename)
+        mimetype = pic.mimetype
+        img = Img(img=pic.read(), mimetype=mimetype, name=filename)
+        db.session.add(img)
+        db.session.commit()
+        return {"message": "Image has been uploaded"}, 200
 
 
 class User(Resource):
+    details_nested_one_parser.add_argument('userid', type=str, required=True, help="userid is required")
+
+
     @classmethod
     @jwt_required(fresh=True)
-    def get(cls, user_name: str):
-        user = UserModel.find_by_username(user_name)
+    def get(cls):
+        details_nested_one_args = details_nested_one_parser.parse_args()
+        user = UserModel.find_by_id(details_nested_one_args['userid'])
         if not user:
             return {"message": USER_NOT_FOUND}, 404
 
@@ -85,8 +104,9 @@ class User(Resource):
 
     @classmethod
     @jwt_required(fresh=True)
-    def delete(cls, user_name: str):
-        user = UserModel.find_by_username(user_name)
+    def delete(cls):
+        details_nested_one_args = details_nested_one_parser.parse_args()
+        user = UserModel.find_by_id(details_nested_one_args['userid'])
         if not user:
             return {"message": USER_NOT_FOUND}, 404
 
@@ -99,19 +119,16 @@ class UserLogin(Resource):
     @classmethod
     def post(cls):
         # get data from parser
-        root_args = root_parser.parse_args()
-        nested_one_args = nested_one_parser.parse_args(req=root_args)
+        # root_args = root_parser.parse_args()
+        nested_one_args = nested_one_parser.parse_args()
         # find user in database
         user = UserModel.find_by_email(nested_one_args['email'])
         # check password
         if user:
             if safe_str_cmp(user.password, nested_one_args['password']):
-                access_token = create_access_token(identity=user.id, fresh=True)
-                refresh_token = create_refresh_token(user.id)
-                return {
-                           'access_token': access_token,
-                           'refresh_token': refresh_token
-                       }, 200
+                access_token = create_access_token(identity=user.userid, fresh=True)
+                refresh_token = create_refresh_token(user.userid)
+                return user.loginData(access_token, refresh_token), 200
             else:
                 return {'message': 'Password does not match'}, 401
         return {'message': 'No user with this mail id'}, 400
@@ -161,4 +178,3 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token": new_token}, 200
-
