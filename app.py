@@ -11,8 +11,6 @@ from blacklist import BLACKLIST
 from db import db
 from ma import ma
 from models.image import Img
-from resources.image import UploadImage
-
 from resources.user import UserRegister, UserLogin, UserLogout, User, TokenRefresh
 
 app = Flask(__name__)
