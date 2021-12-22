@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from flask import request
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token,
@@ -10,11 +9,10 @@ from flask_jwt_extended import (
     get_jwt_identity)
 from werkzeug.security import safe_str_cmp
 from marshmallow import ValidationError
-from werkzeug.utils import secure_filename
 
 from blacklist import BLACKLIST
 from db import db
-from models.user import UserModel, Img
+from models.user import UserModel
 
 USER_ALREADY_EXISTS = "A user with that username already exists."
 USER_EMAIL_EXISTS = "A user with this email already exists."
@@ -72,21 +70,6 @@ class UserRegister(Resource):
         user.save_to_db()
 
         return user.json_data(), 201
-
-
-class UploadImage(Resource):
-    def Post(self):
-        pic = request.files['pic']
-        if not pic:
-            return {"message": "No pic uploaded"}, 400
-
-        filename = secure_filename(pic.filename)
-        mimetype = pic.mimetype
-        img = Img(img=pic.read(), mimetype=mimetype, name=filename)
-        db.session.add(img)
-        db.session.commit()
-        return {"message": "Image has been uploaded"}, 200
-
 
 class User(Resource):
     details_nested_one_parser.add_argument('userid', type=str, required=True, help="userid is required")
