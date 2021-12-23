@@ -7,3 +7,4 @@ Flask-Marshmallow
 marshmallow-sqlalchemy
 PyJWT
 uwsgi
+psycopg2

@@ -8,14 +8,14 @@ from flask_jwt_extended import JWTManager
 from werkzeug.utils import secure_filename
 
 from blacklist import BLACKLIST
-from db import db
+# from db import db
 from ma import ma
 from models.image import Img
 from resources.user import UserRegister, UserLogin, UserLogout, User, TokenRefresh
 
 app = Flask(__name__)
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config['JWT_BLACKLIST_ENABLED'] = True  # enable blacklist feature
@@ -27,9 +27,9 @@ api = Api(app)
 jwt = JWTManager(app)
 
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
+# @app.before_first_request
+# def create_tables():
+#     db.create_all()
 
 
 @jwt.token_in_blocklist_loader
@@ -79,6 +79,7 @@ api.add_resource(UserLogout, "/logout")
 
 
 if __name__ == "__main__":
+    from db import db
     db.init_app(app)
     ma.init_app(app)
     app.run(port=5000, debug=True)
