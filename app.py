@@ -10,7 +10,7 @@ from io import BytesIO
 from werkzeug.utils import secure_filename
 
 from blacklist import BLACKLIST
-# from db import db
+from db import db
 from ma import ma
 from models.image import Img
 from models.mood_tracker import Songs
