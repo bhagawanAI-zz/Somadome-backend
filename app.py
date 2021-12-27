@@ -1,8 +1,10 @@
 import os
+from email.mime import audio
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file, render_template
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from io import BytesIO
 
 # from blacklist import BLACKLIST
 from werkzeug.utils import secure_filename
@@ -11,11 +13,12 @@ from blacklist import BLACKLIST
 # from db import db
 from ma import ma
 from models.image import Img
+from models.mood_tracker import Songs
 from resources.user import UserRegister, UserLogin, UserLogout, User, TokenRefresh
 
 app = Flask(__name__)
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
-uri = os.getenv("DATABASE_URL",  'sqlite:///data.db')  # or other relevant config var
+uri = os.getenv("DATABASE_URL", 'sqlite:///data.db')  # or other relevant config var
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = uri
@@ -31,9 +34,9 @@ api = Api(app)
 jwt = JWTManager(app)
 
 
-# @app.before_first_request
-# def create_tables():
-#     db.create_all()
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 
 @jwt.token_in_blocklist_loader
@@ -72,6 +75,30 @@ def upload():
     return 'Img Uploaded!', 200
 
 
+@app.route('/upload_music/', methods=['POST'])
+def upload_music():
+    musictype = request.args.get('musictype')
+    musicfile = request.files['musicfile']
+    songs = Songs(musictype=musictype, musicfile=musicfile.read())
+    db.session.add(songs)
+    db.session.commit()
+    return 'music Uploaded!', 200
+
+
+@app.route('/music/', methods=['get'])
+def music():
+    musictype = request.args.get('musictype')
+    musicfile_data = Songs.query.filter_by(musictype=musictype).first()
+    # return send_file(BytesIO(musicfile_data.musicfile), attachment_filename='musicfile.mp3', as_attachment=False)
+    # return send_file("musicfile.mp3", mimetype="audio/mp3")
+    print(type(musicfile_data.musicfile))
+    return musicfile_data.musicfile
+
+# @app.route('/music/', methods=['GET'])
+# def music():
+#     musictype = request.args.get('musictype')
+#     return render_template("music.html", musictype=musictype)
+
 api.add_resource(UserRegister, "/register")
 # api.add_resource(User, "/user/<string:user_name>")
 # api.add_resource(User, "/user/<int:userId>")
@@ -84,6 +111,7 @@ api.add_resource(UserLogout, "/logout")
 
 if __name__ == "__main__":
     from db import db
+
     db.init_app(app)
     ma.init_app(app)
     app.run(port=5000, debug=True)
