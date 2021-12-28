@@ -94,6 +94,7 @@ def music():
     print(type(musicfile_data.musicfile))
     return musicfile_data.musicfile
 
+
 # @app.route('/music/', methods=['GET'])
 # def music():
 #     musictype = request.args.get('musictype')
