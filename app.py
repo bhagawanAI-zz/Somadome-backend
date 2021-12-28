@@ -1,7 +1,7 @@
 import os
 from email.mime import audio
 
-from flask import Flask, jsonify, request, send_file, render_template
+from flask import Flask, jsonify, request, send_file, render_template, Response
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from io import BytesIO
@@ -94,6 +94,15 @@ def music():
     print(type(musicfile_data.musicfile))
     return musicfile_data.musicfile
 
+@app.route("/wav")
+def streamwav():
+    def generate():
+        with open("static/music/demo.mp3", "rb") as fwav:
+            data = fwav.read(1024)
+            while data:
+                yield data
+                data = fwav.read(1024)
+    return Response(generate(), mimetype="audio/x-wav")
 
 # @app.route('/music/', methods=['GET'])
 # def music():
