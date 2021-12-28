@@ -8,4 +8,4 @@ class Songs(db.Model):
     # replace = db.Column(db.Boolean)
     # index = db.Column(db.Integer)
     musictype = db.Column(db.Text)
-    musicfile = db.Column(db.Text)
+    musicfile = db.Column(db.LargeBinary)
