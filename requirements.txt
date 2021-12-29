@@ -8,3 +8,4 @@ marshmallow-sqlalchemy
 PyJWT
 uwsgi
 psycopg2
+boto3
