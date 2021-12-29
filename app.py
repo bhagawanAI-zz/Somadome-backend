@@ -85,19 +85,20 @@ def upload_music():
     return 'music Uploaded!', 200
 
 
-@app.route('/music/', methods=['get'])
-def music():
-    musictype = request.args.get('musictype')
-    musicfile_data = Songs.query.filter_by(musictype=musictype).first()
-    # return send_file(BytesIO(musicfile_data.musicfile), attachment_filename='musicfile.mp3', as_attachment=False)
-    # return send_file("musicfile.mp3", mimetype="audio/mp3")
-    print(type(musicfile_data.musicfile))
-    return musicfile_data.musicfile
+# @app.route('/music/', methods=['get'])
+# def music():
+#     musictype = request.args.get('musictype')
+#     musicfile_data = Songs.query.filter_by(musictype=musictype).first()
+#     # return send_file(BytesIO(musicfile_data.musicfile), attachment_filename='musicfile.mp3', as_attachment=False)
+#     # return send_file("musicfile.mp3", mimetype="audio/mp3")
+#     print(type(musicfile_data.musicfile))
+#     return musicfile_data.musicfile
 
 @app.route("/wav")
 def streamwav():
+    musictype = request.args.get('musictype')
     def generate():
-        with open("static/music/demo.mp3", "rb") as fwav:
+        with open(f"static/music/{musictype}.mp3", "rb") as fwav:
             data = fwav.read(1024)
             while data:
                 yield data
