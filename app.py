@@ -9,6 +9,7 @@ from io import BytesIO
 # from blacklist import BLACKLIST
 from werkzeug.utils import secure_filename
 
+from automate_methods import create_presigned_url
 from blacklist import BLACKLIST
 from db import db
 from ma import ma
@@ -75,14 +76,14 @@ def upload():
     return 'Img Uploaded!', 200
 
 
-@app.route('/upload_music/', methods=['POST'])
-def upload_music():
-    musictype = request.args.get('musictype')
-    musicfile = request.files['musicfile']
-    songs = Songs(musictype=musictype, musicfile=musicfile.read())
-    db.session.add(songs)
-    db.session.commit()
-    return 'music Uploaded!', 200
+# @app.route('/upload_music/', methods=['POST'])
+# def upload_music():
+#     musictype = request.args.get('musictype')
+#     musicfile = request.files['musicfile']
+#     songs = Songs(musictype=musictype, musicfile=musicfile.read())
+#     db.session.add(songs)
+#     db.session.commit()
+#     return 'music Uploaded!', 200
 
 
 # @app.route('/music/', methods=['get'])
@@ -94,16 +95,24 @@ def upload_music():
 #     print(type(musicfile_data.musicfile))
 #     return musicfile_data.musicfile
 
-@app.route("/wav")
-def streamwav():
+# @app.route("/wav")
+# def streamwav():
+#     musictype = request.args.get('musictype')
+#     def generate():
+#         with open(f"static/music/{musictype}.mp3", "rb") as fwav:
+#             data = fwav.read(1024)
+#             while data:
+#                 yield data
+#                 data = fwav.read(1024)
+#     return Response(generate(), mimetype="audio/x-wav")
+
+@app.route("/music/", methods=['get'])
+def musicis():
     musictype = request.args.get('musictype')
-    def generate():
-        with open(f"static/music/{musictype}.mp3", "rb") as fwav:
-            data = fwav.read(1024)
-            while data:
-                yield data
-                data = fwav.read(1024)
-    return Response(generate(), mimetype="audio/x-wav")
+    objectname=musictype+".mp3"
+    return create_presigned_url('smarttracmusic',objectname)
+    # return check()
+
 
 # @app.route('/music/', methods=['GET'])
 # def music():
