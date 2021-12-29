@@ -1,12 +1,7 @@
 import logging
-
 from botocore.exceptions import ClientError
-
 from secret import access_key, secret_access_key
-import requests
-
 import boto3
-import os
 
 
 def create_presigned_url(bucket_name, object_name, expiration=3600):

@@ -9,3 +9,4 @@ PyJWT
 uwsgi
 psycopg2
 boto3
+logging
