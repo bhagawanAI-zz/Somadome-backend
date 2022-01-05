@@ -110,7 +110,7 @@ def upload():
 def musicis():
     musictype = request.args.get('musictype')
     objectname=musictype+".mp3"
-    return create_presigned_url('smarttracmusic',objectname)
+    return create_presigned_url('somadome-music',objectname)
     # return check()
 
 
