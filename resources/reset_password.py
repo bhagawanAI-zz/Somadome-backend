@@ -23,8 +23,8 @@ class ForgotPassword(Resource):
             expires = datetime.timedelta(hours=24)
             reset_token = create_access_token(str(user.userid), expires_delta=expires)
 
-            return send_email('[Movie-bag] Reset Your Password',
-                              sender='evilcallsdad95@gmail.com',
+            return send_email('smarttrak_support: Reset Your Password',
+                              sender='support@smarttrak.co',
                               recipients=[user.email],
                               text_body=render_template('email/reset_password.txt',
                                                         url=url + reset_token),
@@ -72,8 +72,8 @@ class ResetPassword(Resource):
             user = UserModel.find_by_id(user_id)
             user.password = password
             user.save_to_db()
-            send_email('[Movie-bag] Password reset successful',
-                       sender='evilcallsdad95@gmail.com',
+            send_email('smarttrak_support: Password reset successful',
+                       sender='support@smarttrak.co',
                        recipients=[user.email],
                        text_body='Password reset was successful',
                        html_body='<p>Password reset was successful</p>')
