@@ -7,11 +7,14 @@ from flask_mail import Mail
 from werkzeug.utils import secure_filename
 from automate_methods import create_presigned_url
 from blacklist import BLACKLIST
+from db import db
 from ma import ma
 from models.image import Img
 
 
 app = Flask(__name__)
+db.init_app(app)
+ma.init_app(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True

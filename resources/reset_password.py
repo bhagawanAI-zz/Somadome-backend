@@ -51,16 +51,6 @@ class ResetTokenValidator(Resource):
             user = UserModel.find_by_id(user_id)
             email_id = user.email
 
-            # user.modify(password=password)
-            # user.hash_password()
-            # user.password = password
-            # user.save_to_db()
-
-            # return send_email('[Movie-bag] Password reset successful',
-            #                   sender='evilcallsdad95@gmail.com',
-            #                   recipients=[user.email],
-            #                   text_body='Password reset was successful',
-            #                   html_body='<p>Password reset was successful</p>')
             if user:
                 return {"user_id": user_id,
                         "email_id": email_id,
