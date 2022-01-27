@@ -23,14 +23,14 @@ class ForgotPassword(Resource):
             expires = datetime.timedelta(hours=24)
             reset_token = create_access_token(str(user.userid), expires_delta=expires)
 
-            send_email('[Movie-bag] Reset Your Password',
-                       sender='evilcallsdad95@gmail.com',
-                       recipients=[user.email],
-                       text_body=render_template('email/reset_password.txt',
-                                                 url=url + reset_token),
-                       html_body=render_template('email/reset_password.html',
-                                                 url=url + reset_token))
-            return {"message": "Email sent to registered mail id"}
+            return send_email('[Movie-bag] Reset Your Password',
+                              sender='evilcallsdad95@gmail.com',
+                              recipients=[user.email],
+                              text_body=render_template('email/reset_password.txt',
+                                                        url=url + reset_token),
+                              html_body=render_template('email/reset_password.html',
+                                                        url=url + reset_token))
+            # return {"message": "Email sent to registered mail id"}
         except Exception as e:
             raise e
 
