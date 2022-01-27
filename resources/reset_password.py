@@ -47,6 +47,7 @@ class ResetTokenValidator(Resource):
                 return "token not found"
 
             user_id = decode_token(reset_token)['sub']
+            print(user_id)
 
             user = UserModel.find_by_id(user_id)
             email_id = user.email
