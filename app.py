@@ -9,7 +9,9 @@ from automate_methods import create_presigned_url
 from blacklist import BLACKLIST
 from db import db
 from ma import ma
+from models.Music import Music
 from models.image import Img
+from models.Session import Session
 
 
 app = Flask(__name__)
@@ -80,7 +82,9 @@ def revoked_token_callback(jwt_headers, jwt_payload):
 def musicis():
     musictype = request.args.get('musictype')
     objectname = musictype + ".mp3"
-    return create_presigned_url('somadome-music', objectname)
+    music = Music.find_by_name(musictype)
+    return {"url": create_presigned_url('somadome-music', objectname),
+            "play_time_in_milliseconds": music.time*1000}
 
 
 @app.route("/device")
