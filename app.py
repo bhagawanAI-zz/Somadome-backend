@@ -10,8 +10,8 @@ from blacklist import BLACKLIST
 from db import db
 from ma import ma
 from models.Music import Music
-from models.image import Img
-from models.Session import Session
+# from models.image import Img
+# from models.Session import Session
 
 
 app = Flask(__name__)
