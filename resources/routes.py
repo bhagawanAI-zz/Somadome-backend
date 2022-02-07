@@ -1,3 +1,4 @@
+from resources.Session import Session
 from resources.device import DeviceRegister, DeviceStatus
 from resources.reset_password import ResetPassword, ForgotPassword, ResetTokenValidator
 from resources.user import UserRegister, UserLogin, UserLogout, User, TokenRefresh
@@ -14,3 +15,4 @@ def initialize_routes(api):
     api.add_resource(ForgotPassword, "/forgot_password")
     api.add_resource(ResetTokenValidator, "/reset_link")
     api.add_resource(ResetPassword, "/reset_password")
+    api.add_resource(Session, "/session")

@@ -10,3 +10,4 @@ uwsgi
 psycopg2
 boto3
 Flask-Mail
+marshmallow
