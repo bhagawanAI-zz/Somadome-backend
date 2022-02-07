@@ -22,7 +22,7 @@ class SessionModel(db.Model):
     domeRating = db.Column(db.Integer)
     domeFeedback = db.Column(CLOB)
     contentRating = db.Column(db.Integer)
-    contentFeedback = db.Column(CLOB)
+    contentFeedback = db.Column(db.String(225))
 
     @classmethod
     def find_by_id(cls, id: int):
