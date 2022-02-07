@@ -1,8 +1,8 @@
 # import json
 from datetime import datetime
 # import pandas as pd
-from flask import jsonify
-from sqlalchemy import DateTime, CLOB
+# from flask import jsonify
+# from sqlalchemy import DateTime, CLOB
 
 from db import db
 
@@ -20,9 +20,9 @@ class SessionModel(db.Model):
     completed = db.Column(db.Boolean, default=False, nullable=False)
     interrupts = db.Column(db.Integer)
     domeRating = db.Column(db.Integer)
-    domeFeedback = db.Column(db.String(225))
+    domeFeedback = db.Column(db.String(10))
     contentRating = db.Column(db.Integer)
-    contentFeedback = db.Column(db.String(225))
+    contentFeedback = db.Column(db.String(10))
 
     @classmethod
     def find_by_id(cls, id: int):
