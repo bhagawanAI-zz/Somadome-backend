@@ -20,7 +20,7 @@ class SessionModel(db.Model):
     completed = db.Column(db.Boolean, default=False, nullable=False)
     interrupts = db.Column(db.Integer)
     domeRating = db.Column(db.Integer)
-    domeFeedback = db.Column(CLOB)
+    domeFeedback = db.Column(db.String(225))
     contentRating = db.Column(db.Integer)
     contentFeedback = db.Column(db.String(225))
 
