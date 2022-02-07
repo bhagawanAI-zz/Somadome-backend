@@ -1,6 +1,6 @@
-import json
+# import json
 from datetime import datetime
-import pandas as pd
+# import pandas as pd
 from flask import jsonify
 from sqlalchemy import DateTime, CLOB
 
@@ -38,16 +38,16 @@ class SessionModel(db.Model):
             "date": g.starttime
         }
 
-    @classmethod
-    def get_date(cls, o1):
-        df = pd.DataFrame({'full_date': pd.date_range(o1.starttime, periods=1)})
-        df['date'] = df['full_date'].dt.date
-        print(df['date'])
-        return df['date']
-
-    @classmethod
-    def get_time(cls, o1):
-        df = pd.DataFrame({'full_date': pd.date_range(o1.starttime, periods=1)})
-        df['time'] = df['full_date'].dt.time
-        print(df['time'])
-        return df['time']
+    # @classmethod
+    # def get_date(cls, o1):
+    #     df = pd.DataFrame({'full_date': pd.date_range(o1.starttime, periods=1)})
+    #     df['date'] = df['full_date'].dt.date
+    #     print(df['date'])
+    #     return df['date']
+    #
+    # @classmethod
+    # def get_time(cls, o1):
+    #     df = pd.DataFrame({'full_date': pd.date_range(o1.starttime, periods=1)})
+    #     df['time'] = df['full_date'].dt.time
+    #     print(df['time'])
+    #     return df['time']
