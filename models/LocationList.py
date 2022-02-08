@@ -10,7 +10,7 @@ class LocationListModel(db.Model):
     website = db.Column(db.String(128))
     phoneNumber = db.Column(db.String(20))
     bookingLink = db.Column(db.String(225))
-    photoLink = db.Column(db.String(225))
+    photoLink = db.Column(db.String(500))
     comments = db.Column(db.String(225), default =None)
     latitude = db.Column(db.String(20))
     longitude = db.Column(db.String(20))
